@@ -6,11 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,9 +29,11 @@ public class Config {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity
                 .csrf(csrf->csrf.disable())
+                .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests( auth -> auth
                         .requestMatchers("/public/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/user/roles/**").hasRole("ADMIN")
+                        .anyRequest().denyAll()
                 )
 //                .logout(logout -> logout.logoutUrl("/logout"))
                 .addFilterBefore(
@@ -58,7 +59,7 @@ public class Config {
        @Override
        public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
            User user = userRepository.findByUsername(username).orElseThrow (()-> new UsernameNotFoundException("User not found"));
-           return new CustomDetails(user);
+           return user;
        }
    }
 

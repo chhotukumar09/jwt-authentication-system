@@ -15,6 +15,7 @@ public class UserService {
     public String signupUser(UserDTO userDTO){
         User user = new User();
         user.setUsername(userDTO.getUsername());
+        user.setRole(userDTO.getRole());
         String encodePass = passwordEncoder.encode(userDTO.getPassword());
         user.setPassword(encodePass);
         userRepository.save(user);

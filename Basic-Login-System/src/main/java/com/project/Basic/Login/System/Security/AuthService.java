@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 
@@ -26,10 +27,10 @@ public class AuthService {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        CustomDetails customDetails = (CustomDetails) authentication.getPrincipal();
+        User user = (User) authentication.getPrincipal();
 
-        String token = authUtil.generateJWT(customDetails);
-        return new JwtToken(token , customDetails.getUser().getId());
+        String token = authUtil.generateJWT(user);
+        return new JwtToken(token , user.getId());
 
     }
 }
